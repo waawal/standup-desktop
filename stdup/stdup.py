@@ -59,7 +59,7 @@ class StdupDesktop(object):
             else:
                 self.default_handler(msg, data)
         except Exception as e:
-            logger.error('Message handler error: {}'.format(msg))
+            logger.exception('Message handler error: {}'.format(msg))
 
     def closed(self, code, reason=None):
         pass
@@ -80,6 +80,14 @@ class StdupDesktop(object):
 
     def on_welcome(self, msg, data):
         logger.info('welcome: {}'.format(data.get('name')))
+        self._add_participant(msg, data)
+
+    def on_keepalive(self, msg, data):
+        logger.info('keepalive')
+        self._send_msg('alive', name=self.name)
+
+    def on_alive(self, msg, data):
+        logger.info('alive: {}'.format(data.get('name')))
         self._add_participant(msg, data)
 
     def on_set(self, msg, data):

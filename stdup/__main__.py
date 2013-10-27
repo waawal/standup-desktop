@@ -37,7 +37,8 @@ logger = logging.getLogger(__name__)
 
 server = sys.argv[1]
 room = sys.argv[2]
-name = 'stdup-desktop'
+name = sys.argv[3]
+video = bool(sys.argv[4])
 
 
 class StdupClient(TornadoWebSocketClient):
@@ -49,7 +50,7 @@ class StdupClient(TornadoWebSocketClient):
     def opened(self):
         logger.debug('opened')
         try:
-            self.stdup = StdupDesktop(self, room, name)
+            self.stdup = StdupDesktop(self, room, name, video)
         except Exception as e:
             logger.exception('opened exception')
 

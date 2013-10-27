@@ -26,8 +26,9 @@ logger = logging.getLogger(__name__)
 
 class SkypeCaller(object):
 
-    def __init__(self, desktop):
+    def __init__(self, desktop, video=False):
         self.desktop = desktop
+        self.video = video
         super(SkypeCaller, self).__init__()
         self.run()
 
@@ -48,6 +49,13 @@ class SkypeCaller(object):
         self.finish_call()
         if contacts:
             try:
-                self.skype.PlaceCall(*contacts)
+                call = self.skype.PlaceCall(*contacts)
+                def on_call_status(call, status):
+                    if status == 'INPROGRESS':
+                        if self.video:
+                            call.StartVideoSend()
+                    # elif status == 'FINISHED':
+                    #     pass
+                self.skype.OnCallStatus = on_call_status
             except Skype4Py.SkypeError as e:
                 logger.error('PLACE CALL ERROR {}'.format(e))

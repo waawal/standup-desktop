@@ -31,12 +31,12 @@ logger = logging.getLogger(__name__)
 
 class StdupDesktop(object):
 
-    def __init__(self, conn, room, name):
+    def __init__(self, conn, room, name, video):
         self.conn = conn
         self.room = room
         self.name = name
         self.participants = OrderedDict()
-        self.skype = skype.SkypeCaller(self)
+        self.skype = skype.SkypeCaller(self, video)
         self.kde = kde.KdeWindowManager()
         self._opened()
         logger.info('Connection established.')

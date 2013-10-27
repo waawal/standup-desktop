@@ -22,6 +22,8 @@ import logging
 import pprint
 import sys
 
+import skype
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +35,7 @@ class StdupDesktop(object):
         self.room = room
         self.name = name
         self.participants = OrderedDict()
+        self.skype = skype.SkypeCaller()
         self._opened()
         logger.info('Connection established.')
 
@@ -92,6 +95,13 @@ class StdupDesktop(object):
 
     def on_set(self, msg, data):
         logger.info('set: {}'.format(data))
+
+    def on_call(self, msg, data):
+        logger.info('call')
+        contacts = filter(None,
+                          [p.get('contact', None)
+                           for p in self.participants.values()])
+        self.skype.place_call(contacts)
 
     # ===== Participants ===== #
 

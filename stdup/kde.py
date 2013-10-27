@@ -30,12 +30,14 @@ class KdeWindowManager(object):
         self.workspace = 6
 
     def show(self):
+        logger.info('kde show')
         envoy.run('qdbus org.kde.kwin /KWin org.kde.KWin.setCurrentDesktop 6',
                   timeout=2)
         # envoy.run('killall firefox', timeout=2)
         # envoy.connect('firefox http://standup-backend.herokuapp.com/?room=12')
 
     def hide(self):
+        logger.info('kde hide')
         envoy.run(('qdbus org.kde.kwin /KWin '
                   'org.kde.KWin.setCurrentDesktop {}')
                       .format(self.prev_workspace),

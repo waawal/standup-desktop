@@ -14,14 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import unicode_literals, print_function
+from __future__ import unicode_literals
 
+import logging
 import sys
 
 from tornado import ioloop
 from ws4py.client.tornadoclient import TornadoWebSocketClient
 
 from stdup import StdupDesktop
+
+
+log_formatter = logging.Formatter('%(levelname)-8s | %(name)-8s :: %(message)s')
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(log_formatter)
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.DEBUG)
+root_logger.addHandler(console_handler)
+
+logger = logging.getLogger(__name__)
 
 
 server = sys.argv[1]
@@ -36,19 +47,34 @@ class StdupClient(TornadoWebSocketClient):
         self.stdup = None
 
     def opened(self):
-        self.stdup = StdupDesktop(self, room, name)
+        logger.debug('opened')
+        try:
+            self.stdup = StdupDesktop(self, room, name)
+        except Exception as e:
+            logger.exception('opened exception')
 
     def received_message(self, msg):
-        self.stdup.received_message(msg)
+        logger.debug('received_message: {}'.format(msg))
+        try:
+            self.stdup.received_message(msg)
+        except Exception as e:
+            logger.exception('received_message exception')
 
     def closed(self, code, reason=None):
-        self.stdup.closed(code, reason)
-        self.stdup = None
-        ioloop.IOLoop.instance().stop()
+        logger.debug('closed: code={code} reason={reason}'
+                     .format(code=code, reason=reason))
+        try:
+            self.stdup.closed(code, reason)
+            self.stdup = None
+            ioloop.IOLoop.instance().stop()
+        except Exception as e:
+            logger.exception('closed exception')
 
     def _cleanup(self):
-        print('cleanup', file=sys.stderr)
-        pass
+        try:
+            logger.debug('_cleanup')
+        except Exception as e:
+            logger.exception('_cleanup exception')
 
 
 ws = StdupClient('ws://{server}/sock/websocket'.format(server=server),

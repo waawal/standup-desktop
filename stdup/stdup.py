@@ -14,12 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import unicode_literals, print_function
+from __future__ import unicode_literals
 
 from collections import OrderedDict
 import json
+import logging
 import pprint
 import sys
+
+
+logger = logging.getLogger(__name__)
 
 
 class StdupDesktop(object):
@@ -30,7 +34,7 @@ class StdupDesktop(object):
         self.name = name
         self.participants = OrderedDict()
         self._opened()
-        print('Connection established.')
+        logger.info('Connection established.')
 
     def _opened(self):
         self._send_msg('join', room=self.room, name=self.name)
@@ -39,13 +43,13 @@ class StdupDesktop(object):
         try:
             data = json.loads(msg.data)
         except Exception as e:
-            print('msg parse error:', e.__class__, e, file=sys.stderr)
+            logger.error('Message JSON parse error: {}'.format(msg))
             return
 
         try:
             handler_fn = 'on_' + data['msg']
         except KeyError as e:
-            print('msg error: {}'.format(msg), file=sys.stderr)
+            logger.error('Message structure error: {}'.format(msg))
             return
 
         try:
@@ -55,10 +59,10 @@ class StdupDesktop(object):
             else:
                 self.default_handler(msg, data)
         except Exception as e:
-            print('msg handler error:', e.__class__, e, file=sys.stderr)
+            logger.error('Message handler error: {}'.format(msg))
 
     def closed(self, code, reason=None):
-        print('closed')
+        pass
 
     def _send_msg(self, msg, **data):
         data['msg'] = msg
@@ -67,19 +71,19 @@ class StdupDesktop(object):
     # ===== Message Handlers ===== #
 
     def default_handler(self, msg, data):
-        print('unhandled message:', msg, file=sys.stderr)
+        logger.error('unhandled message: {}'.format(msg))
 
     def on_join(self, msg, data):
-        print('join:', msg)
+        logger.info('join: {}'.format(msg))
         self._send_msg('welcome', name=self.name)
         self._add_participant(msg, data)
 
     def on_welcome(self, msg, data):
-        print('{name} welcomes you.'.format(name=data.get('name')))
+        logger.info('welcome: {}'.format(data.get('name')))
         self._add_participant(msg, data)
 
     def on_set(self, msg, data):
-        print('set:', msg.data)
+        logger.info('set: {}'.format(data))
 
     # ===== Participants ===== #
 
@@ -90,5 +94,5 @@ class StdupDesktop(object):
             'contact': data.get('contact', None),
         }
         self.participants[name] = participant
-        print(' * current participants:')
-        pprint.pprint(self.participants)
+        parts = pprint.pformat(self.participants)
+        logger.info('* current participants: \n{}'.format(parts))

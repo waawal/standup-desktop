@@ -29,15 +29,20 @@ class SkypeCaller(object):
     def __init__(self):
         self.skype = Skype4Py.Skype()
         self.skype.Attach()
-        self.call = None
 
     def finish_call(self):
-        if self.call:
-            self.call.Finish()
-            self.call = None
+        for c in self.skype.ActiveCalls:
+            try:
+                c.Finish()
+            except Skype4Py.SkypeError as e:
+                # already finished?
+                logger.error('FINISH ERROR {}'.format(e))
 
     def place_call(self, contacts):
         logger.info('calling {}'.format(contacts))
         self.finish_call()
         if contacts:
-            self.call = self.skype.PlaceCall(*contacts)
+            try:
+                self.skype.PlaceCall(*contacts)
+            except Skype4Py.SkypeError as e:
+                logger.error('PLACE CALL ERROR {}'.format(e))

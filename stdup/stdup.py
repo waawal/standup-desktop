@@ -98,6 +98,12 @@ class StdupDesktop(object):
     def on_set(self, msg, data):
         logger.info('set: {}'.format(data))
 
+    def on_start(self, msg, data):
+        logger.info('start')
+
+    def on_stop(self, msg, data):
+        logger.info('stop')
+
     def on_call(self, msg, data):
         logger.info('call')
         contacts = filter(None,

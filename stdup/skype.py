@@ -26,7 +26,12 @@ logger = logging.getLogger(__name__)
 
 class SkypeCaller(object):
 
-    def __init__(self):
+    def __init__(self, desktop):
+        self.desktop = desktop
+        super(SkypeCaller, self).__init__()
+        self.run()
+
+    def run(self):
         self.skype = Skype4Py.Skype()
         self.skype.Attach()
 

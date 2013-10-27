@@ -36,7 +36,7 @@ class StdupDesktop(object):
         self.room = room
         self.name = name
         self.participants = OrderedDict()
-        self.skype = skype.SkypeCaller()
+        self.skype = skype.SkypeCaller(self)
         self.kde = kde.KdeWindowManager()
         self._opened()
         logger.info('Connection established.')
@@ -103,13 +103,13 @@ class StdupDesktop(object):
         contacts = filter(None,
                           [p.get('contact', None)
                            for p in self.participants.values()])
-        self.skype.place_call(contacts)
         self.kde.show()
+        self.skype.place_call(contacts)
 
     def on_hangup(self, msg, data):
         logger.info('call')
-        self.skype.finish_call()
         self.kde.hide()
+        self.skype.finish_call()
 
     # ===== Participants ===== #
 

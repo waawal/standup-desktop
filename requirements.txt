@@ -1,3 +1,12 @@
+Jinja2==2.7.1
+MarkupSafe==0.18
 Skype4Py==1.0.35
+Werkzeug==0.9.4
+envoy==0.0.2
+ipython==1.1.0
+itsdangerous==0.23
+six==1.4.1
+-e git+git@github.com:mrjoes/sockjs-tornado.git@66cf43d9da13c52c4b5ff4bd5aa61cfe19b9cc72#egg=sockjs_tornado-master
 tornado==3.1.1
 ws4py==0.3.2
+wsgiref==0.1.2
